@@ -429,11 +429,17 @@ int start_sim(ModelInstance* _c)
 	else {
 		return 1;
 	}
-#else
+#else // linux, MacOS
 	if (stat (FRUNWEAFILE, &stat_p)>=0){
 		//char *const argv[]={"runenergyplus", _c->mID, FRUNWEAFILE, NULL};
+#ifdef __APPLE__
+        // *do not* call EPMacro!
 		char *const argv[]={"energyplus", "-w", FRUNWEAFILE, "-p", _c->mID,
-			"-s", "C", "-x", "-m", "-r", _c->in_file_name, NULL};
+            "-s", "C", "-x", "-r", _c->in_file_name, NULL};
+#else
+        char *const argv[]={"energyplus", "-w", FRUNWEAFILE, "-p", _c->mID,
+            "-s", "C", "-x", "-m", "-r", _c->in_file_name, NULL};
+#endif
 		// execute the command string
 		retVal=posix_spawnp( &_c->pid, argv[0], NULL, NULL, argv, environ);
 		return retVal;
@@ -441,8 +447,14 @@ int start_sim(ModelInstance* _c)
 	else
 	{
 		//char *const argv[]={"runenergyplus", _c->mID, NULL};
+#ifdef __APPLE__
+        // *do not* call EPMacro!
 		char *const argv[]={"energyplus", "-p", _c->mID, "-s", "C", "-x",
-			"-m", "-r", _c->in_file_name, NULL};
+			"-r", _c->in_file_name, NULL};
+#else
+        char *const argv[]={"energyplus", "-p", _c->mID, "-s", "C", "-x",
+            "-m", "-r", _c->in_file_name, NULL};
+#endif
 		// execute the command string
 		retVal=posix_spawnp( &_c->pid, argv[0], NULL, NULL, argv, environ);
 		return retVal;
@@ -1111,7 +1123,15 @@ DllExport fmi2Status fmi2EnterInitializationMode(fmi2Component c)
 	_c->functions->logger(_c->componentEnvironment, _c->instanceName, fmi2OK, "ok",  "fmi2EnterInitializationMode: The port number is %d.\n", port_num);
 
 	// get the hostname information
+#ifdef _MSC_VER
 	gethostname(ThisHost, MAXHOSTNAME);
+#elif __linux__
+    gethostname(ThisHost, MAXHOSTNAME);
+#elif __APPLE__
+    // Hack, however, system "hostname" and contents of /etc/hosts not aligned, 
+    // named(8) not running ...
+    strcpy(ThisHost,"localhost");
+#endif
 	if  ((hp=gethostbyname(ThisHost))==NULL ) {
 		_c->functions->logger(_c->componentEnvironment,  _c->instanceName, fmi2Error,
 			"error", "fmi2EnterInitializationMode: Get host by name failed.\n");

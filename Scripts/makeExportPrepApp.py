@@ -297,7 +297,7 @@ if __name__ == '__main__':
     currIdx += 1
   #
   # Run.
-  exportPrepExeName = makeExportPrepApp(showDiagnostics, litter, True)
+  exportPrepExeName = makeExportPrepApp(showDiagnostics, litter, True, 2)
 
 
 #--- Copyright notice.

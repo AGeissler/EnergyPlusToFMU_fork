@@ -29,4 +29,5 @@ fi
 #   Note if the C system library implements memmove(), then #define HAVE_MEMMOVE.
 # This is necessary for compiling Expat.
 #
-gcc -c -fast -fPIC  -DHAVE_MEMMOVE  "$@"
+#gcc -c -fast -fPIC  -DHAVE_MEMMOVE  "$@"
+gcc -c -fPIC -Wno-nullability-completeness -DHAVE_MEMMOVE  "$@"

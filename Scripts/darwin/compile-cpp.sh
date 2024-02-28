@@ -26,4 +26,5 @@ fi
 
 #--- Compile.
 #
-g++ -c -fPIC "$@"
+#g++ -c -fPIC "$@"
+g++ -c -fPIC -Wno-nullability-completeness "$@"
